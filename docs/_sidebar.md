@@ -1,4 +1,4 @@
 - 高级特性
-- 函数式编程
+- 函数式编程(foo)
   - [高阶函数](functional-program/functional-program.md)
-- 模块
+- [模块(library)](module/module.md)
