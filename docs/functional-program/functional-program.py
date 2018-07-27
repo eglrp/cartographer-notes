@@ -1,5 +1,7 @@
 # ### 高阶函数
+#
 # #### 概念
+#
 # 一个函数接收另一个函数作为参数，这种函数就称之为高阶函数。
 
 #%%
@@ -16,6 +18,7 @@ add(x, y, f)
 # return 11
 # 
 # #### map/reduce
+# 
 # map(function, iterable):**注意**,其实就是线性变换
 #%%
 def f(x):
@@ -30,7 +33,9 @@ list(L)
 # map()作为高阶函数，事实上它把运算规则抽象了，因此，我们不但可以计算简单的f(x)=x2，还可以计算任意复杂的函数，比如，把这个list所有数字转为字符串：
 #%%
 list(map(str, [1,2,3,4,5,6]))
+# 
 # #### reduce
+# 
 # reduce(function, iterable)把一个函数作用在一个序列[x1, x2, x3, ...]上，这个函数必须接收两个参数，reduce把结果继续和序列的下一个元素做累积计算，其效果就是：
 # **就是降维，就是卷积**
 #%%
@@ -39,7 +44,9 @@ def f(x,y):
     return x*10 +y
 
 reduce(f, [1,2,3,4,5,6])
+# 
 # #### filter
+# 
 #%%
 list(filter(lambda x:x%2==1, [1,2,3,4,5,6]))
 
@@ -47,14 +54,17 @@ list(filter(lambda x:x%2==1, [1,2,3,4,5,6]))
 #%%
 list(filter(lambda s:s and s.strip() , ['A', '', 'B', None, 'C', '  ']))
 
+# 
 # #### sort
+# 
 # 对数列进行排序
 #%%
 sorted([2,4,-5,1,6,-10,3,5])
 sorted([2,4,-5,1,6,-10,3,5],key=abs)
 sorted([2,4,-5,1,6,-10,3,5],reverse=True)
-
+# 
 # ### 闭包(函数对象)
+# 
 # 闭包`Closure`相当于c++的函数对象，内部函数可以调用对象的变量和函数，返回值其实就是函数对象的实例化
 #%%
 def lazy_sum(*args): #函数对象
@@ -96,8 +106,9 @@ assert (f1() == 9)
 # - Q2: 闭包的成员变量有几个. A: 2个　　fn, i,很多人会忽略i,这正是出错的原因
 # - Q3: 调用count知乎i是几，　A: 3,而且会一直保存着，和fs一样，他们都是成员变量
 # 所以到这里答案已经很明显了。上面的三个问题其实也是你在写闭包的时候必须问自己的。如果你有C++基础就当作闭包来写好了。
-
+#
 # ### lambda表达式(匿名函数)
+# 
 
 # 其实就是lambda表达式,c++也有，不过写法不同，最容易出错的是python的写法没有return.（**注意**自己在使用的时候犯过错）.
 # 那么lambda函数要怎么写,先看正常函数的写法。
@@ -112,8 +123,9 @@ def f(x):
 # - **加lambda**: 如下
 #%%
 lambda x: x * x
-
-# ### 装饰器
+# 
+# ### 装饰器(特殊高阶函数)
+# 
 # 又是一个熟悉的概念，设计模式中行为模式的一种。起到函数的伟哥。冬天里的大棉袄。
 #%%
 def now():
@@ -185,10 +197,13 @@ import functools
 # 或者针对带参数的decorator：
 def log(text):
     def decorator(func):
-        @functools.wraps(func)
+        @functools.wraps(func) # wrapper.__name__ = func.__name__
         def wrapper(*args, **kw):
             print('%s %s():' % (text, func.__name__))
             return func(*args, **kw)
         return wrapper
     return decorator
 # import functools是导入functools模块。模块的概念稍候讲解。现在，只需记住在定义wrapper()的前面加上@functools.wraps(func)即可。
+# 
+# ### 偏函数(对应c++ bind)
+#

@@ -1,5 +1,17 @@
 ### 高阶函数
+
+
+```python
+#
+```
+
 #### 概念
+
+
+```python
+#
+```
+
 一个函数接收另一个函数作为参数，这种函数就称之为高阶函数。
 
 
@@ -19,6 +31,7 @@ add(x, y, f)
 return 11
 
 #### map/reduce
+
 map(function, iterable):**注意**,其实就是线性变换
 
 
@@ -47,7 +60,9 @@ map()作为高阶函数，事实上它把运算规则抽象了，因此，我们
 list(map(str, [1,2,3,4,5,6]))
 ```
 
+
 #### reduce
+
 reduce(function, iterable)把一个函数作用在一个序列[x1, x2, x3, ...]上，这个函数必须接收两个参数，reduce把结果继续和序列的下一个元素做累积计算，其效果就是：
 **就是降维，就是卷积**
 
@@ -61,7 +76,9 @@ def f(x,y):
 reduce(f, [1,2,3,4,5,6])
 ```
 
+
 #### filter
+
 
 
 ```python
@@ -77,7 +94,9 @@ list(filter(lambda x:x%2==1, [1,2,3,4,5,6]))
 list(filter(lambda s:s and s.strip() , ['A', '', 'B', None, 'C', '  ']))
 ```
 
+
 #### sort
+
 对数列进行排序
 
 
@@ -88,7 +107,9 @@ sorted([2,4,-5,1,6,-10,3,5],key=abs)
 sorted([2,4,-5,1,6,-10,3,5],reverse=True)
 ```
 
+
 ### 闭包(函数对象)
+
 闭包`Closure`相当于c++的函数对象，内部函数可以调用对象的变量和函数，返回值其实就是函数对象的实例化
 
 
@@ -148,10 +169,11 @@ assert (f1() == 9)
 
 
 ```python
-
+#
 ```
 
 ### lambda表达式(匿名函数)
+
 
 
 ```python
@@ -180,7 +202,9 @@ def f(x):
 lambda x: x * x
 ```
 
-### 装饰器
+
+### 装饰器(特殊高阶函数)
+
 又是一个熟悉的概念，设计模式中行为模式的一种。起到函数的伟哥。冬天里的大棉袄。
 
 
@@ -299,7 +323,7 @@ import functools
 ```python
 def log(text):
     def decorator(func):
-        @functools.wraps(func)
+        @functools.wraps(func) # wrapper.__name__ = func.__name__
         def wrapper(*args, **kw):
             print('%s %s():' % (text, func.__name__))
             return func(*args, **kw)
@@ -308,3 +332,11 @@ def log(text):
 ```
 
 import functools是导入functools模块。模块的概念稍候讲解。现在，只需记住在定义wrapper()的前面加上@functools.wraps(func)即可。
+
+### 偏函数(对应c++ bind)
+
+
+```python
+#
+```
+
