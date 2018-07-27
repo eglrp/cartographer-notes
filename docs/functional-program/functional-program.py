@@ -1,4 +1,4 @@
-# ### 高阶函数
+# ### 高阶函数(算法函数)
 #
 # #### 概念
 #
@@ -17,9 +17,9 @@ add(x, y, f)
 
 # return 11
 # 
-# #### map/reduce
+# #### map(translate)
 # 
-# map(function, iterable):**注意**,其实就是线性变换
+# (function, iterable):**注意**,其实就是线性变换
 #%%
 def f(x):
     return x*x
@@ -34,7 +34,7 @@ list(L)
 #%%
 list(map(str, [1,2,3,4,5,6]))
 # 
-# #### reduce
+# #### reduce(reduce, accumulate)
 # 
 # reduce(function, iterable)把一个函数作用在一个序列[x1, x2, x3, ...]上，这个函数必须接收两个参数，reduce把结果继续和序列的下一个元素做累积计算，其效果就是：
 # **就是降维，就是卷积**
@@ -45,7 +45,7 @@ def f(x,y):
 
 reduce(f, [1,2,3,4,5,6])
 # 
-# #### filter
+# #### filter(copy_if)
 # 
 #%%
 list(filter(lambda x:x%2==1, [1,2,3,4,5,6]))
@@ -55,7 +55,7 @@ list(filter(lambda x:x%2==1, [1,2,3,4,5,6]))
 list(filter(lambda s:s and s.strip() , ['A', '', 'B', None, 'C', '  ']))
 
 # 
-# #### sort
+# #### sorted(sort)
 # 
 # 对数列进行排序
 #%%
@@ -80,9 +80,8 @@ f = lazy_sum(1, 3, 5, 7, 9) # 函数对象实例化１
 f2 = lazy_sum(1, 3, 5, 7, 9) # 函数对象实例化２　两个对象之间没有联系
 f
 f()
-# <function lazy_sum.<locals>.sum at 0x101c6ed90>
-# 
-# 25
+#<function lazy_sum.<locals>.sum at 0x101c6ed90>
+#25
 # 下面来理解这么一个句子
 #%%
 def count():
@@ -207,3 +206,29 @@ def log(text):
 # 
 # ### 偏函数(对应c++ bind)
 #
+# 先來看c++11的簡單例子。
+# ```cpp
+# #include <functional>
+# #include <iostream>
+#  
+# using namespace std;
+# using namespace std::placeholders; 
+#  
+# int product(int a, int b){
+#     return a * b;
+# }
+#  
+# int main(){
+#     auto product_3 = std::bind(product, _1, 3);
+#     cout << product_3(5) << endl;
+# }
+# ```
+def add(a, b):
+    return a + b
+ 
+import functools
+add_two = functools.partial(add, b=2)
+ 
+print add_two(5)
+
+# python 的例子就比 c++ 简单多了。 从第五行很明显看到 add_two function就是 把 b 的值固定成 2 的 add funcion。
