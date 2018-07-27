@@ -1,10 +1,3 @@
----
-title: python函数式编程
-date: 2018-07-26 19:35:47
-tags: python
-category: python
----
-
 ### 高阶函数
 #### 概念
 一个函数接收另一个函数作为参数，这种函数就称之为高阶函数。
@@ -81,12 +74,6 @@ list(filter(lambda x:x%2==1, [1,2,3,4,5,6]))
 
 ```python
 #%%
-```
-
-list(filter(lambda s:s and s.strip(), ['A    ', '    B    ', s and s.strip()'      C','  D    D   ']))
-
-
-```python
 list(filter(lambda s:s and s.strip() , ['A', '', 'B', None, 'C', '  ']))
 ```
 
