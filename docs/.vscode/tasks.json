@@ -11,9 +11,11 @@
         {
             "label": "py2md",
             "type": "shell",
-            // "command": "py2md.py ${fileBasename}.py ${fileBasename}.md "
-            // "command": "hello world"
-            "command": "py2md.py ${fileDirname}/${fileBasename}> ${fileDirname}/${fileBasenameNoExtension}.md "
+            "command": "py2md.py ${fileDirname}/${fileBasename}> ${fileDirname}/${fileBasenameNoExtension}.md ",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }
