@@ -2,5 +2,4 @@
 - 函数式编程(foo)
   - [高阶函数](functional-program/functional-program.md)
 - [模块(library)](module/module.md)
-- [面对对象编程（oop）](oop/oop.md)
 - [io编程(io)](io/io.md)
