@@ -48,7 +48,7 @@ with open(file, 'r') as f:
 # 写文件和读文件是一样的，唯一区别是调用open()函数时，传入标识符'w'或者'wb'表示写文本文件或写二进制文件：
 # #### 覆盖版
 #%%
-with open(file, 'a') as f:
+with open(file, 'w') as f:
     f.write("aaaa")
 
 with open(file, 'r') as f:
@@ -60,11 +60,27 @@ with open(file, 'r') as f:
 # #### 追加版
 #  
 # 细心的童鞋会发现，以'w'模式写入文件时，如果文件已存在，会直接覆盖（相当于删掉后新写入一个文件）。如果我们希望追加到文件末尾怎么办？可以传入'a'以追加（append）模式写入。(以a替代w)
+#%%
+with open(file, 'a') as f:
+    f.write("aaaa")
+
+with open(file, 'r') as f:
+    print(f.read())
+
+
 # 
 # ## 操作文件和目录
 # 
 # 如果要在Python程序中执行这些目录和文件的操作怎么办？其实操作系统提供的命令只是简单地调用了操作系统提供的接口函数，Python内置的os模块也可以直接调用操作系统提供的接口函数。
-# ##系统信息
+# ## 环境变量
+#%%
+import os
+os.environ
+# 要获取某个环境变量的值，可以调用os.environ.get('key')：
+os.environ.get('PATH')
+#...
+
+# ## 系统信息
 #%%
 import os
 os.name # 操作系统类型
@@ -73,13 +89,10 @@ os.uname()
 # 查看当前目录的绝对路径:
 os.path.abspath('.')
 #'/$path'
-
 # 在某个目录下创建一个新目录，首先把新目录的完整路径表示出来:
 os.path.join('/Users/michael', 'testdir')
 #'/Users/michael/testdir'
-
 # 然后创建一个目录:
 os.mkdir('/Users/michael/testdir')
-
 # 删掉一个目录:
 os.rmdir('/Users/michael/testdir')

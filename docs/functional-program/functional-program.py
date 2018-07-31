@@ -1,9 +1,8 @@
 # ### 高阶函数(算法函数)
-#
+# 
 # #### 概念
-#
+# 
 # 一个函数接收另一个函数作为参数，这种函数就称之为高阶函数。
-
 #%%
 def add(x, y, f):
     return f(x) + f(y)
@@ -14,8 +13,8 @@ y = 6
 f = abs
 
 add(x, y, f)
+#return 11
 
-# return 11
 # 
 # #### map(translate)
 # 
