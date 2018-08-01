@@ -91,6 +91,12 @@ loop.close()
 # ## C++
 # 
 # c/c++不直接支持协程语义，但有不少开源的协程库，如：
-# Protothreads：一个“蝇量级” C 语言协程库
-# libco:来自腾讯的开源协程库libco介绍，官网
-# coroutine:云风的一个C语言同步协程库,详细信息
+# - Protothreads：一个“蝇量级” C 语言协程库
+# - libco:来自腾讯的开源协程库libco介绍，官网
+# - coroutine:云风的一个C语言同步协程库,详细信息
+# 
+# 目前看到大概有四种实现协程的方式：
+# - 第一种：利用glibc 的 ucontext组件(云风的库)
+# - 第二种：使用汇编代码来切换上下文(实现c协程)
+# - 第三种：利用C语言语法switch-case的奇淫技巧来实现（Protothreads)
+# - 第四种：利用了 C 语言的 setjmp 和 longjmp（ 一种协程的 C/C++ 实现,要求函数里面使用 static local 的变量来保存协程内部的数据）
