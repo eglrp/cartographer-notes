@@ -1,1 +1,3 @@
 - [cartographer-ros](cartographer-ros/turn.md)
+- [课程](class/scan-matching-in-2d-slam.md)
+- [论文](class/real-time-loop-closure-in-2d-lidar-slam.md)

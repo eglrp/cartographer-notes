@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "docs"
+		},
+		{
+			"path": "/home/syue/catkin_ws/src/cartographer"
+		},
+		{
+			"path": "/home/syue/catkin_ws/src/cartographer_ros"
+		}
+	],
+	"settings": {
+		"python.autoComplete.extraPaths": [
+			"/home/syue/catkin_ws/devel/lib/python3/dist-packages",
+			"/opt/ros/kinetic/lib/python2.7/dist-packages"
+		],
+		"git.ignoreLimitWarning": true
+	}
+}
