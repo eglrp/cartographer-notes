@@ -48,9 +48,9 @@ Such a system for outdoor SLAM that uses a graph-based approach, local `scan-to-
 “扫描到扫描匹配”经常用于计算“基于激光”的SLAM方法中的相对姿态变化，例如[1] - [4]。
 然而，就其本身而言，“扫描到扫描匹配”很快就会累积错误。
 “扫描到地图匹配”有助于限制错误的累积。使用Gauss-Newton在线性插值地图上找到局部最优的一种方法是[5]。
-在存在良好的姿势初始估计的情况下，在这种情况下通过使用足够高的数据速率LIDAR提供，局部优化的“扫描到地图匹配”是有效且稳健的。
+在存在良好的位姿初始估计的情况下，在这种情况下通过使用足够高的数据速率LIDAR提供，局部优化的“扫描到地图匹配”是有效且稳健的。
 在不稳定的平台上，使用惯性测量单元（IMU）将激光扇投影到水平面上以估计重力方向。
-“像素精确”扫描匹配`方法，如[1]，进一步减少了局部误差累积。
+`“像素精确”扫描匹配`方法，如[1]，进一步减少了局部误差累积。
 虽然计算上更昂贵，但这种方法对于“＂闭环＂检测”也很有用。
 一些方法着重于通过匹配激光扫描的“提取特征”来改善计算成本[4]。
 其他方法（用于“＂闭环＂检测”）包括“基于直方图的匹配”[6]，扫描数据中的“特征检测”，以及使用“机器学习”[7]。
@@ -59,7 +59,7 @@ Such a system for outdoor SLAM that uses a graph-based approach, local `scan-to-
 对于“基于网格的SLAM”，随着地图变大，这很快变得资源密集;例如我们的一个测试案例是在3公里的轨道上收集了22,000平方米。
 较小的维度特征表示，例如[9]，其不需要每个粒子的网格图，可用于减少资源需求。
 当需要最新的网格图时，[10]建议计算子图，仅在必要时更新，以便最终的图是所有子图的光栅化。
-“基于图形”的方法适用于表示姿势和特征的节点集合。
+“基于图形”的方法适用于表示位姿和特征的节点集合。
 图中的边是由观察产生的约束。
 可以使用各种优化方法来最小化由所有约束引入的误差，例如， [11]，[12]。
 在[13]中描述了这种用于室外SLAM的系统，其使用基于图的方法，局部“扫描到扫描”匹配，以及基于子图特征的直方图的重叠局部图的匹配。
@@ -83,14 +83,14 @@ We achieve this by using a `branch-and-bound approach` and several `precomputed 
 “Google的制图师”提供了一种实时室内地图绘制解决方案，其形式为配备传感器的背包，可生成r = 5 cm分辨率的2D网格地图。
 系统的操作员可以看到在穿过建筑物时创建的地图。
 “激光扫描”被插入到最佳“估计位置”的子图中，假定在短时间内足够准确。
-“扫描匹配”发生在最近的“子图”上，因此它只取决于最近的扫描，并且世界框架中“姿势估计”的错误会累积。
+“扫描匹配”发生在最近的“子图”上，因此它只取决于最近的扫描，并且世界框架中“位姿估计”的错误会累积。
 为了在适度的硬件要求下获得良好的性能，我们的SLAM方法不使用“粒子滤波器”。
-为了应对错误的积累，我们“定期”运行“姿势优化”。
+为了应对错误的积累，我们“定期”运行“位姿优化”。
 当一个子图完成时，就不会再将新的扫描插入其中，“它将参与扫描匹配以获得＂闭环＂”。
 所有已完成的子图和扫描都会自动考虑进行＂闭环＂。
-如果它们基于当前的“姿势估计”足够“接近”，则“扫描匹配器”试图在子图中找到扫描。
-如果在当前“估计的姿势”周围的搜索窗口中找到足够好的匹配，则将其作为“＂闭环＂约束”添加到“优化问题”。
-通过每隔几秒完成一次优化，操作员的经验就是当“重新访问位置”时“循环立即关闭”。
+如果它们基于当前的“位姿估计”足够“接近”，则“扫描匹配器”试图在子图中找到扫描。
+如果在当前“估计的位姿”周围的搜索窗口中找到足够好的匹配，则将其作为“＂闭环＂约束”添加到“优化问题”。
+通过每隔几秒完成一次优化，操作员的经验就是当“重新访问位置”时“立即闭环”。
 这导致了“软实时约束”，即“＂闭环＂扫描匹配”必须“比”添加新扫描更快“，否则它会明显落后。
 我们通过对每个完成的子图使用“分支定界方法”和几个“预先计算的网格”来实现这一点
 
@@ -147,7 +147,15 @@ For every hit, we insert the closest grid point into the hit set.
 For every miss, we insert the grid point associated with each pixel that intersects one of the rays between the scan origin and each scan point, excluding grid points which are already in the hit set. 
 Every formerly unobserved grid point is assigned a probability $p_{hit}$ or $p_{miss}$ if it is in one of these sets. 
 If the grid point x has already been n observed, we update the odds for hits and misses as
-
+一些连续扫描用于构建子图。
+这些子图采用概率网格的形式$M : \gamma \Bbb Z × \gamma \Bbb Z \rightarrow [p_{min}, p_{max}]$，它以给定分辨率`r`的离散网格点进行映射，例如5厘米，到值。
+这些值可以被认为是网格点被阻挡的概率。
+对于每个网格点，我们将相应的“像素”定义为最接近该网格点的所有点。
+每当要将扫描插入概率网格时，计算用于命中的一组网格点和用于未命中的不相交组。
+对于每次击中，我们将最近的网格点插入到命中集中。
+对于每个未命中，我们插入与每个像素相关联的网格点，该网格点与扫描原点和每个扫描点之间的一条光线相交，不包括已经在命中集中的网格点。
+如果每个以前未观察到的网格点位于其中一个集合中，则会为其分配概率$p_{hit}$ 或 $p_{miss}$。
+如果已经观察到网格点x，我们更新命中和未命中的几率
 $$
 odds(p) = \frac{p}{1-p}, \tag1
 $$
@@ -157,13 +165,15 @@ $$
 
 and equivalently for misses
 
-        balabala
+等同于未命中
+
+![image](/home/syue/github/cartographer-notes/docs/asset/carto_submap.png)
 
 ### C. Ceres `scan matching`
 
 Prior to inserting a scan into a submap, the scan pose $\xi$ is optimized, relative to the current local submap,(using a Ceresbased [14] `scan matcher`). The `scan matcher` is responsible for finding a scan pose that `maximizes the probabilities` at the scan points in the submap. We cast this as a `nonlinear least squares problem`
 
-在将扫描插入子图之前，扫描姿势“ξ”相对于当前局部子图进行优化（使用Ceresbased [14]扫描匹配器）。 扫描匹配器负责在子图中的扫描点处找到“最大化概率”的扫描姿势。 我们将其视为“非线性最小二乘问题”
+在将扫描插入子图之前，扫描位姿“ξ”相对于当前局部子图进行优化（使用Ceresbased [14]扫描匹配器）。 扫描匹配器负责在子图中的扫描点处找到“最大化概率”的扫描位姿。 我们将其视为“非线性最小二乘问题”
 
 $$
  \underset {\xi}{argmin} \sum_{k=1}^K(1-M_(smooth(T_\xi h_k)))^2
@@ -174,10 +184,10 @@ The function $M_{smooth} : \Bbb R^2 → \Bbb R$ is a smooth version of the proba
 We use bicubic interpolation.
 As a result, values outside the interval $[0, 1]$ can occur but are considered harmless.
 
-其中Tξ根据扫描姿势将hk从扫描帧变换到子图帧。
-函数Msmooth：R 2→R是局部子图中概率值的平滑版本。
+其中$T\xi$根据扫描位姿将$h_k$从扫描帧变换到子图帧。
+函数$M_{smooth} : \Bbb R^2 → \Bbb R$是局部子图中概率值的平滑版本。
 我们使用双三次插值。
-结果，可以发生区间[0,1]之外的值，但是被认为是无害的。
+结果，可以发生区间$[0, 1]$之外的值，但是被认为是无害的。
 
 Mathematical optimization of this smooth function usually gives better precision than the resolution of the grid.
 Since this is a local optimization, good initial estimates are required. 
@@ -202,10 +212,10 @@ A `scan matcher` is run in the background and if a good match is found, the corr
 由于扫描仅与包含少量最近扫描的子图匹配，因此上述方法会慢慢累积错误。
 对于仅几十次连续扫描，累积误差很小。
 通过创建许多小子图来处理更大的空间。
-我们的方法，优化所有扫描和子图的姿势，遵循"稀疏姿势调整"[2]。
-插入扫描的相对姿势存储在存储器中，以用于＂闭环＂优化。
-除了这些相对姿势之外，一旦子图不再发生变化，所有其他由扫描和子图组成的对都被认为是＂闭环＂。
-扫描匹配器在后台运行，如果找到良好匹配，则会将相应的相对姿势添加到优化问题中
+我们的方法，优化所有扫描和子图的位姿，遵循"稀疏位姿调整"[2]。
+插入扫描的相对位姿存储在存储器中，以用于＂闭环＂优化。
+除了这些相对位姿之外，一旦子图不再发生变化，所有其他由扫描和子图组成的对都被认为是＂闭环＂。
+扫描匹配器在后台运行，如果找到良好匹配，则会将相应的相对位姿添加到优化问题中
 
 ### A. Optimization problem
 `Loop closure` optimization, like `scan matching`, is also formulated as `a nonlinear least squares problem` which allows easily adding residuals to take additional data into account. 
@@ -225,8 +235,8 @@ The covariance matrices Σij can be evaluated, for example, following the approa
 The residual E for such a constraint is computed by
 
 在给定一些约束的情况下，子图构成$\Xi^m = \lbrace\xi_i^m\rbrace_{i=1,...,m}$和世界中的扫描构成$\Xi^s = \lbrace\xi_j^s\rbrace_{j=1,...,n}$被优化。
-这些约束采用相对姿势$\xi_{ij}$和相关协方差矩阵$\Sigma_ij$的形式。
-对于一对子图i和扫描j，姿势ξij描述了子图坐标系中扫描匹配的位置。
+这些约束采用相对位姿$\xi_{ij}$和相关协方差矩阵$\Sigma_ij$的形式。
+对于一对子图i和扫描j，位姿ξij描述了子图坐标系中扫描匹配的位置。
 协方差矩阵Σij可以被评估，例如，遵循[15]中的方法，或者局部地使用Ceres [14]与（CS）的协方差估计特征。
 这种约束的残差E由下式计算
 $$
@@ -251,7 +261,7 @@ Alternative approaches to outliers include [16].
 例如，这可能发生在局部对称环境中，例如办公室隔间。
 异常值的替代方法包括[16]。
 
-### B. Branch-and-bound scan matchin
+### B. Branch-and-bound scan match
 
 We are interested in the optimal, `pixel-accurate match`
 
@@ -602,7 +612,7 @@ We demonstrated that it is possible to run our algorithms on modest hardware in 
 在本文中，我们提出并实验验证了一个2D SLAM系统，该系统将“扫描到子图匹配”与“＂闭环＂检测”和“图形优化”相结合。
 使用我们的基于网格的局部SLAM方法创建单个子图轨迹。
 在后台，所有扫描都使用“像素精确扫描匹配”匹配到附近的子图，以创建“＂闭环＂约束”。
-子图和扫描姿势的约束图在后台定期优化。
+子图和扫描位姿的约束图在后台定期优化。
 向操作员呈现最终地图的最新预览，作为完成的子地图和当前子地图的GPU加速组合。
 我们证明了可以在适度的硬件上实时运行我们的算法。
 
@@ -635,7 +645,7 @@ The data for the Freiburg University Hospital was provided by Bastian Steder, Ra
 
 1875/5000
 [1] E. Olson，“M3RSM：多对多分辨率扫描匹配”，载于IEEE国际机器人与自动化会议论文集（ICRA），2015年6月。
-[2] K. Konolige，G。Grisetti，R。Kummerle，W。Burgard，B。Limketkai，¨和R. Vincent，“"稀疏姿势调整"2D绘图”，在IROS，台湾台北，2010年10月10日。
+[2] K. Konolige，G。Grisetti，R。Kummerle，W。Burgard，B。Limketkai，¨和R. Vincent，“"稀疏位姿调整"2D绘图”，在IROS，台湾台北，2010年10月10日。
 [3] F. Lu和E. Milios，“用于环境绘图的全局一致范围扫描对准”，自主机器人，第一卷。 4，不。 4，pp.333- 349,1997。
 [4]F.Mart'ın，R。Triebel，L。Moreno和R. Siegwart，“两种不同的三维构图工具：基于DE的扫描匹配和基于特征的环路检测”，Robotica，vol。 32，不。 01，pp.19-41,2014。
 [5] S. Kohlbrecher，J。Meyer，O。von Stryk和U. Klingauf，“具有完整3D运动估计的灵活且可扩展的SLAM系统”，Proc。 IEEE国际安全，安全和救援机器人研讨会（SSRR）。 IEEE，2011年11月。
