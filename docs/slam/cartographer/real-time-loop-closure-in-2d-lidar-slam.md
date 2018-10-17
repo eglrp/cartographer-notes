@@ -1,5 +1,4 @@
-Real-Time Loop Closure in 2D LIDAR SLAM
-
+# Real-Time Loop Closure in 2D LIDAR SLAM 
 
 ## Abstract 摘要
 
@@ -47,6 +46,7 @@ cartographer `定期`运行`位姿优化`来减少误差积累。
 两种方法都优化了由LIDAR观测的（x，y）平移和旋转ξθ组成的姿态ξ=（ξx，ξy，ξθ），其进一步被称为`扫描`。
 在不平的地面上，IMU用于估计重力方向，将扫描从水平安装的LIDAR投影到2D世界。
 在我们的局部方法中，每个连续扫描与`Submap`相匹配，使用`非线性优化`将扫描与Submap对齐; 该过程称为` real time Scan match`,其随着时间累积误差，我们的全局方法将其去除，如第五节所述。
+
 
 ###  A. Scans
 
@@ -137,6 +137,7 @@ $$
 对于一对Submapi和扫描j，位姿ξij描述了Submap坐标系中Scan match的位置。
 协方差矩阵Σij可以被评估，例如，遵循[15]中的方法，或者局部地使用Ceres [14]与（CS）的协方差估计特征。
 这种约束的残差E由下式计算
+
 $$
 E^2(\xi_i^m, \xi_j^s;\Sigma_{ij},\xi_{ij}) = e(\xi_i^m,\xi_j^s;\xi_{ij})^T\Sigma_{ij}^{-1}e(\xi_i^m,\xi_j^s;\xi_{ij}),\tag4
 $$
@@ -189,7 +190,8 @@ W = \{\xi_0 + (rj_x, rj_y, \xi_\theta j_\theta):(j_x,j_y,j_\theta) \in \overline
 $$
 
 找到$\xi^*$的朴素算法很容易制定，参见算法1，但对于搜索窗口大小，我们考虑到它会太慢。
-![image](/cartographer-notes/docs/asset/algo2.png)
+
+![image](https://github.com/lsy563193/image/blob/master/cartographer_notes/algo1.png)
 
 相反，我们使用branch-and-bound在较大的搜索窗口上有效地计算$\xi^*$。
 有关通用方法，请参见算法2。
@@ -238,9 +240,9 @@ $$
 \overline{W}_c = \overline{\overline{W}} \cap \overline{W}\tag{12}
 $$
 
-![image](/cartographer-notes/docs/asset/algo2.png)
+![image](https://github.com/lsy563193/image/blob/master/cartographer_notes/algo2.png)
 
-![image](/cartographer-notes/docs/asset/algo3.png)
+![image](https://github.com/lsy563193/image/blob/master/cartographer_notes/algo3.png)
 
     
 叶节点具有高度$c_h=0$，并且对应于可行解$W\ni\xi_c=\xi_0 +（rc_x，rc_y，\xi_\theta c_\theta）$。
@@ -248,7 +250,7 @@ $$
 在我们的算法3的公式中，包含所有可行解的根节点没有明确地出现并且分支到一组初始节点$C_0$，在固定高度$h_0$覆盖搜索窗口
 
 $$
-\overline{W}_{0,x} =  \{ -w_x + 2^{h_o}:j_x \in \B  b Z, 0 \leq 2^{h_o} \leq 2w_x \} \\
+\overline{W}_{0,x} =  \{ -w_x + 2^{h_o}:j_x \in \Bbb Z, 0 \leq 2^{h_o} \leq 2w_x \} \\
 \overline{W}_{0,x} =  \{ -w_x + 2^{h_o}:j_x \in \Bbb Z, 0 \leq 2^{h_o} \leq 2w_x \} \\
 \overline{W}_{0,x} =  \{ -w_x + 2^{h_o}:j_x \in \Bbb Z, 0 \leq 2^{h_o} \leq 2w_x \} \\
 C_0 = \overline{W}_{0,x} \times \overline{W}_{0,y} \times \overline{W}_{0,\theta} \times \{h_0\} \tag{13}

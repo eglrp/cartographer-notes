@@ -1,9 +1,10 @@
-
 ##【泡泡机器人公开课】第二十三课：Scan Matching in 2D SLAM by 张明明
 
 ## 概述 Scan Matching
 两类
 Real-Time Loop Cloare in 2D LIDAR SLAM.ICRA2016,提到scan matching的两种方法
+
+
 ### scan-to-ccan --ICP,etc
 - 计算成本大
 - 累积误差,需进行闭环
