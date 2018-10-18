@@ -54,6 +54,8 @@ Submap构造是重复对齐scan和Submap坐标帧的迭代过程。
 随着扫描的原点在$0 \in \Bbb R^2$，我们现在将关于扫描点的信息写为$H = \lbrace h_k\rbrace _{k=1,...,K}, h_k \in \Bbb R^2$。
 Submap帧中扫描帧的姿态$\xi$表示为变换$T_\xi$，它将扫描点从扫描帧严格转换为Submap帧，定义为
 
+$H = \lbrace hc \rbrace_{12}$
+
 $$
 T_\xi = 
 \underbrace{
