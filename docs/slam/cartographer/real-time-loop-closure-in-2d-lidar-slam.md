@@ -51,63 +51,68 @@ cartographer `定期`运行`位姿优化`来减少误差积累。
 ###  A. Scans
 
 Submap构造是重复对齐scan和Submap坐标帧的迭代过程。
-随着扫描的原点在$0 \in \Bbb R^2$，我们现在将关于扫描点的信息写为$H = \lbrace h_k\rbrace _{k=1,...,K}, h_k \in \Bbb R^2$。
+随着扫描的原点在$0 \in \Bbb R^2$，我们现在将关于扫描点的信息写为 
+
+$H = \lbrace h\_c\rbrace _{k=1,...,K}, h _k \in \Bbb R^2$ 
+
 Submap帧中扫描帧的姿态$\xi$表示为变换$T_\xi$，它将扫描点从扫描帧严格转换为Submap帧，定义为
 
-$H = \lbrace hc \rbrace_{12}$
-
 $$
-T_\xi = 
+\newcommand{\xidlt}{\xi\_\delta}
+T\_\xi = 
 \underbrace{
 \left(
     \begin {matrix}
-        cos\xi_\delta & -sin\xi_\delta \\
-        sin\xi_\delta & sin\xi_\delta
+        cos\xidlt & -sin\xidlt \\\
+        sin\xidlt & sin\xidlt
     \end{matrix} 
-\right)}_{R_\xi}
+\right)}\_{R\_\xi}
 p +
 \underbrace{
 \left(\begin {matrix} 
-    \xi_x \\
-    \xi_y
-\end{matrix} \right)}_{t_\xi}.
+    \xi\_x \\\
+    \xi\_y
+\end{matrix} \right)}\_{t\_\xi}.
 \tag1
 $$
 
+
 ### B. Submaps
 
-一些连续扫描用于构建Submap。
-这些Submap采用概率网格的形式$M : \gamma \Bbb Z × \gamma \Bbb Z \rightarrow [p_{min}, p_{max}]$，它以给定分辨率`r`的离散网格点进行映射，例如5厘米，到值。
+一些连续扫描用于构建Submap。 这些Submap采用概率网格的形式$M : \gamma \Bbb Z × \gamma \Bbb Z \rightarrow [p\_{min}, p_{max}]$，它以给定分辨率`r`的离散网格点进行映射，例如5厘米。
 这些值可以被认为是网格点被阻挡的概率。
+
 对于每个网格点，我们将相应的`像素`定义为最接近该网格点的所有点。
 每当要将扫描插入概率网格时，计算用于命中的一组网格点和用于未命中的不相交组。
 对于每次击中，我们将最近的网格点插入到命中集中。
 对于每个未命中，我们插入与每个像素相关联的网格点，该网格点与扫描原点和每个扫描点之间的一条光线相交，不包括已经在命中集中的网格点。
 如果每个以前未观察到的网格点位于其中一个集合中，则会为其分配概率$p_{hit}$ 或 $p_{miss}$。
 如果已经观察到网格点x，我们更新命中和未命中的几率
+
 $$
 odds(p) = \frac{p}{1-p}, \tag1
 $$
+
 $$
-M_{new}(x) = clamp(odds^{-1}(odds(M_{old}(x))\cdot odds(p_{hit}))) \tag1
+M\_{new}(x) = clamp(odds^{-1}(odds(M\_{old}(x))\cdot odds(p_{hit}))) \tag1
 $$
 
 and equivalently for misses
 
 等同于未命中
 
-![image](/cartographer-notes/docs/asset/carto_submap.png)
+![image](https://github.com/lsy563193/image/blob/master/cartographer_notes/carto_submap.png?raw=true)
 
 ### C. Ceres scan matching
 
 在将扫描插入Submap之前，扫描位姿`ξ`相对于当前局部Submap进行优化（使用Ceresbased [14]Scan match器）。 扫描匹配器负责在Submap中的扫描点处找到`最大概率`的扫描位姿。 我们将其视为`非线性最小二乘问题`
 
 $$
- \underset {\xi}{argmin} \sum_{k=1}^K(1-M_(smooth(T_\xi h_k)))^2
+ \underset {\xi}{argmin} \sum\_{k=1}^K(1-M\_(smooth(T\_\xi h\_k)))^2
 $$
 
-其中$T\xi$根据扫描位姿将$h_k$从scan帧变换到Submap帧。
-函数$M_{smooth} : \Bbb R^2 → \Bbb R$是局部Submap中概率值的平滑版本。
+其中$T\xi$根据扫描位姿将$h\_k$从scan帧变换到Submap帧。
+函数$M\_{smooth} : \Bbb R^2 → \Bbb R$是局部Submap中概率值的平滑版本。
 我们使用双三次插值。
 结果，可以发生区间$[0, 1]$之外的值，但是被认为是无关紧要的。
 这种平滑函数的数学优化通常比网格的分辨率提供更好的精度。
@@ -131,24 +136,25 @@ global scan matcher在后台运行，如果找到良好匹配，则会将相应�
 每隔几秒钟，我们使用Ceres [14]来计算解决方案
 
 $$
-\underset{\Xi^m,\Xi^n}{argmin} \frac{1}{2}\sum_{ij}\rho(E^2(\xi _i^m,\xi _j^s;\sigma_{ij},\xi_{ij}))\tag{SPA}
+\underset{\Xi^m,\Xi^n}{argmin} \frac{1}{2}\sum_{ij}\rho(E^2(\xi \_i^m,\xi \_j^s;\sigma\_{ij},\xi\_{ij}))\tag{SPA}
 $$
 
-在给定一些约束的情况下，Submap构成$\Xi^m = \lbrace\xi_i^m\rbrace_{i=1,...,m}$和世界中的扫描构成$\Xi^s = \lbrace\xi_j^s\rbrace_{j=1,...,n}$被优化。
+在给定一些约束的情况下，Submap构成$\Xi^m = \lbrace\xi\_i^m\rbrace\_{i=1,...,m}$和世界中的扫描构成$\Xi^s = \lbrace\xi\_j^s\rbrace\_{j=1,...,n}$被优化。
 这些约束采用相对位姿$\xi_{ij}$和相关协方差矩阵$\Sigma_ij$的形式。
 对于一对Submapi和扫描j，位姿ξij描述了Submap坐标系中Scan match的位置。
 协方差矩阵Σij可以被评估，例如，遵循[15]中的方法，或者局部地使用Ceres [14]与（CS）的协方差估计特征。
 这种约束的残差E由下式计算
 
 $$
-E^2(\xi_i^m, \xi_j^s;\Sigma_{ij},\xi_{ij}) = e(\xi_i^m,\xi_j^s;\xi_{ij})^T\Sigma_{ij}^{-1}e(\xi_i^m,\xi_j^s;\xi_{ij}),\tag4
+E^2(\xi\_i^m, \xi\_j^s;\Sigma\_{ij},\xi\_{ij}) = e(\xi\_i^m,\xi\_j^s;\xi\_{ij})^T\Sigma\_{ij}^{-1}e(\xi\_i^m,\xi\_j^s;\xi\_{ij}),\tag4
 $$
+
 $$
-e(\xi_i^m,\xi_j^s;\xi_{ij}) = \xi_{ij} - 
+e(\xi\_i^m,\xi\_j^s;\xi\_{ij}) = \xi\_{ij} - 
 \left( 
     \begin{matrix} 
-    R_{\xi_i^m}^{-1}(t_{\xi_i^m}-t_{\xi_j^s}) \\
-    \xi_{ij} - \xi_{j;\theta}^s
+    R\_{\xi\_i^m}^{-1}(t\_{\xi\_i^m}-t\_{\xi\_j^s}) \\
+    \xi\_{ij} - \xi\_{j;\theta}^s
     \end{matrix}
 \right).\tag5
 $$
@@ -161,39 +167,40 @@ $$
 
 我们对最佳的`像素精确匹配`感兴趣
 $$
-\xi^* = \underset{\xi\in\omega}{argmax}\sum_{k=1}^kM_{nearest}(T_\xi h_k)),\tag{BBS}
+\xi^* = \underset{\xi\in\omega}{argmax}\sum\_{k=1}^kM\_{nearest}(T\_\xi h\_k)),\tag{BBS}
 $$
 
-其中$\omega$是搜索窗口，$M_{nearest}$是M扩展到所有$\Bbb R^2$，首先将其参数四舍五入到最近的网格点，即将网格点的值扩展为相应的像素。使用（CS）可以进一步提高匹配的质量。
+其中$\omega$是搜索窗口，$M\_{nearest}$是M扩展到所有$\Bbb R^2$，首先将其参数四舍五入到最近的网格点，即将网格点的值扩展为相应的像素。使用（CS）可以进一步提高匹配的质量。
 
 通过仔细选择步长来提高效率。
-我们选择角度步长$\xi_\theta$，以便最大范围$d_{max}$的扫描点移动不超过$r$，即一个像素的宽度。
+我们选择角度步长$\xi\_\theta$，以便最大范围$d\_{max}$的扫描点移动不超过$r$，即一个像素的宽度。
 我们推导出使用余弦定律
 
 $$
-d_{max} = \underset{k=1,...,K}{max} \|h_k\|,\tag6 \\
+d\_{max} = \underset{k=1,...,K}{max} \|h\_k\|,\tag6 \\
 $$
 $$
-\xi_\theta = arccos(1-\frac{r^2}{2d_max^2})\tag7
-$$
-
-
-我们计算了包含给定线性和角度搜索窗口大小的整数步骤，例如$W_x=W_y=7m$和$W_\theta=30\degree$
-$$
-w_x = \lceil\frac{W_x}{r}\rceil,\ w_y = \lceil\frac{W_y}{r}\rceil,\ w_\theta = \lceil\frac{W_\theta}{\xi_\theta}\rceil.\tag8
+\xi\_\theta = arccos(1-\frac{r^2}{2d\_max^2})\tag7
 $$
 
-这导致一个有限的集$W$形成一个围绕估计$\xi_\theta$放置在其中心的搜索窗口，
+
+我们计算了包含给定线性和角度搜索窗口大小的整数步骤，例如$W\_x=W\_y=7m$和$W\_\theta=30 \degree$
+
 $$
-\overline{W} = \{-w_x,...,w_x\} \times \{-w_y,...,w_y\} \times \{-w_\theta,...,w_\theta\}\tag9
+w\_x = \lceil\frac{W\_x}{r}\rceil,\ w\_y = \lceil\frac{W\_y}{r}\rceil,\ w\_\theta = \lceil\frac{W\_\theta}{\xi\_\theta}\rceil.\tag8
+$$
+
+这导致一个有限的集$W$形成一个围绕估计$\xi\_\theta$放置在其中心的搜索窗口，
+$$
+\overline{W} = \{-w\_x,...,w\_x\} \times \{-w\_y,...,w\_y\} \times \{-w\_\theta,...,w\_\theta\}\tag9
 $$
 $$
-W = \{\xi_0 + (rj_x, rj_y, \xi_\theta j_\theta):(j_x,j_y,j_\theta) \in \overline{W}\}\tag{10}
+W = \{\xi\_0 + (rj\_x, rj\_y, \xi\_\theta j\_\theta):(j\_x,j\_y,j\_\theta) \in \overline{W}\}\tag{10}
 $$
 
 找到$\xi^*$的朴素算法很容易制定，参见算法1，但对于搜索窗口大小，我们考虑到它会太慢。
 
-![image](https://github.com/lsy563193/image/blob/master/cartographer_notes/algo1.png)
+![image](https://github.com/lsy563193/image/blob/master/cartographer_notes/algo1.png?raw=true)
 
 相反，我们使用branch-and-bound在较大的搜索窗口上有效地计算$\xi^*$。
 有关通用方法，请参见算法2。
@@ -224,45 +231,45 @@ $$
 
 2）分支规则：
 
-树中的每个节点由整数元组$c=（c_x，c_y，c_θ，c_h）\in\Bbb Z^4$描述。
+树中的每个节点由整数元组$c=（c\_x，c\_y，c\_θ，c\_h）\in\Bbb Z^4$描述。
 高度为ch的节点最多可合并$2^{ch}\times2^{ch}$可能的翻译，但代表一个特定的轮换：
 
 $$
-\overline {\overline{W}} = (\{j_x,j_y\} \in \Bbb{Z}^2:\\
-        \left.
-        \begin{array}{l}
-        c_x \leq j_x < c_x + 2^{ch}\\
-        c_x \leq j_x < c_x + 2^{ch}
+\overline {\overline{W}} = \Bigg(\{j\_x,j\_y\} \in \Bbb{Z}^2:  \\\
+\Big\lbrace
+\begin{array}{l}
+        c\_x \leq j\_x < c\_x + 2^{ch} \\\
+        c\_x \leq j\_x < c\_x + 2^{ch}
         \end{array}
-        \right\}
-        \times \{c_\theta\},\tag11
+\Big\rbrace
+        \times \lbrace c\_\theta \rbrace \Bigg) ,\tag{11}
 $$
 
 $$
-\overline{W}_c = \overline{\overline{W}} \cap \overline{W}\tag{12}
+\overline{W}\_c = \overline{\overline{W}} \cap \overline{W}\tag{12}
 $$
 
-![image](https://github.com/lsy563193/image/blob/master/cartographer_notes/algo2.png)
+![image](https://github.com/lsy563193/image/blob/master/cartographer_notes/algo2.png?raw=true)
 
-![image](https://github.com/lsy563193/image/blob/master/cartographer_notes/algo3.png)
+![image](https://github.com/lsy563193/image/blob/master/cartographer_notes/algo3.png?raw=true)
 
     
-叶节点具有高度$c_h=0$，并且对应于可行解$W\ni\xi_c=\xi_0 +（rc_x，rc_y，\xi_\theta c_\theta）$。
+叶节点具有高度$c\_h=0$，并且对应于可行解$W\ni\xi\_c=\xi\_0 +（rc\_x，rc\_y，\xi\_\theta c\_\theta）$。
 
-在我们的算法3的公式中，包含所有可行解的根节点没有明确地出现并且分支到一组初始节点$C_0$，在固定高度$h_0$覆盖搜索窗口
-
-$$
-\overline{W}_{0,x} =  \{ -w_x + 2^{h_o}:j_x \in \Bbb Z, 0 \leq 2^{h_o} \leq 2w_x \} \\
-\overline{W}_{0,x} =  \{ -w_x + 2^{h_o}:j_x \in \Bbb Z, 0 \leq 2^{h_o} \leq 2w_x \} \\
-\overline{W}_{0,x} =  \{ -w_x + 2^{h_o}:j_x \in \Bbb Z, 0 \leq 2^{h_o} \leq 2w_x \} \\
-C_0 = \overline{W}_{0,x} \times \overline{W}_{0,y} \times \overline{W}_{0,\theta} \times \{h_0\} \tag{13}
-$$
-
-At a given node c with $c_h > 1$, we branch into up to four children of height $c_h − 1$
-在$c_h>1$的给定节点c，我们分支最多四个子高度$c_h − 1$
+在我们的算法3的公式中，包含所有可行解的根节点没有明确地出现并且分支到一组初始节点$C\_0$，在固定高度$h\_0$覆盖搜索窗口
 
 $$
-C_c = ((\{c_x,c_x + 2^{c_h-1}\} \times {c_y, c_y + 2^{c_h-1} \times c_\theta}) \cap \overline{W}) \times \{c_h-1\}\tag{14}
+\overline{W}\_{0,x} =  \lbrace -w\_x + 2^{h\_o}:j\_x \in \Bbb Z, 0 \leq 2^{h\_o} \leq 2w\_x \rbrace, \\\
+\overline{W}\_{0,x} =  \lbrace -w\_x + 2^{h\_o}:j\_x \in \Bbb Z, 0 \leq 2^{h\_o} \leq 2w\_x \rbrace, \\\
+\overline{W}\_{0,x} =  \lbrace -w\_x + 2^{h\_o}:j\_x \in \Bbb Z, 0 \leq 2^{h\_o} \leq 2w\_x \rbrace, \\\
+C\_0 = \overline{W}\_{0,x} \times \overline{W}\_{0,y} \times \overline{W}\_{0,\theta} \times \{h\_0\}. \tag{13}
+$$
+
+At a given node c with $c\_h > 1$, we branch into up to four children of height $c\_h − 1$
+在$c\_h>1$的给定节点c，我们分支最多四个子高度$c\_h − 1$
+
+$$
+C\_c = \Big((\lbrace c\_x,c\_x + 2^{c\_h-1}\rbrace \times {c\_y, c\_y + 2^{c\_h-1} \times c\_\theta}) \cap \overline{W}\Big) \times \lbrace c\_h-1 \rbrace \tag{14}
 $$
 
 
@@ -276,31 +283,31 @@ We use
 我们用
 
 $$
-score(c) = \sum_{k=1}^{K}\underset{j\in \overline{\overline{W_c}}}{max}M{nearest}(T\xi_jh_k) \\
-\geq\sum_{k=1}^{K}\underset{j\in \overline{W_c}}{max}M_{nearest}(T\xi_{j}h_{k})\\
-\underset{j\in \overline{W_c}}{max}\sum_{k=1}^{K}maxM_{nearest}(T\xi_{j}h_{k})\tag{15}
+score(c) = \sum\_{k=1}^{K}\underset{j\in \overline{\overline{W\_c}}}{max}M{nearest}(T\xi\_jh\_k) \\\
+\geq\sum\_{k=1}^{K}\underset{j\in \overline{W\_c}}{max}M\_{nearest}(T\xi\_{j}h\_{k})\\\
+\geq\underset{j\in \overline{W\_c}}{max}\sum\_{k=1}^{K}maxM\_{nearest}(T\xi\_{j}h\_{k}).\tag{15}
 $$
 
-为了能够有效地计算最大值，我们使用预先计算的网格$M_{precomp}^{ch}$。
-每个可能的高度$c_h$预先计算一个网格允许我们用扫描点数的effor linear计算得分。
-请注意，为了能够执行此操作，我们还计算了超过$\overline{\overline{W_c}}$的最大值，该值可能大于我们搜索空间边界附近的$\overline{W_c}$。
+为了能够有效地计算最大值，我们使用预先计算的网格$M\_{precomp}^{ch}$。
+每个可能的高度$c\_h$预先计算一个网格允许我们用扫描点数的effor linear计算得分。
+请注意，为了能够执行此操作，我们还计算了超过$\overline{\overline{W\_c}}$的最大值，该值可能大于我们搜索空间边界附近的$\overline{W\_c}$。
 
 $$
-score(c) = \sum_{k=1}^{K}M_{precomp}^{ch}(T\xi_{c}h_{k})\tag{16}
+score(c) = \sum\_{k=1}^{K}M\_{precomp}^{ch}(T\xi\_{c}h\_{k})\tag{16}
 $$
 $$
-M_{precomp}^{ch}(x,y) =  
+M\_{precomp}^{ch}(x,y) =  
     \underset
     {\begin{matrix}
-        x^, \in [x,x+r(2^h-1)] \\
+        x^, \in [x,x+r(2^h-1)] \\\
         y^, \in [y,y+r(2^h-1)]
     \end{matrix}}
     {max}
-M_{nearest}(x^, , y^,) \tag{17}
+M\_{nearest}(x^, , y^,) \tag{17}
 $$
 
-与叶节点一样使用$\xi_c$。
-请注意，Mhprecomp与$M_{nearest}$具有相同的像素结构，但在每个像素中存储从那里开始的$2^h\times 2^h$像素值的最大值。
+与叶节点一样使用$\xi\_c$。
+请注意，Mhprecomp与$M\_{nearest}$具有相同的像素结构，但在每个像素中存储从那里开始的$2^h\times 2^h$像素值的最大值。
 图3给出了这种预先计算的网格的一个例子。
 
 为了使构建预先计算的网格的计算工作量保持在较低水平，我们要等到概率网格不再接收更新。
