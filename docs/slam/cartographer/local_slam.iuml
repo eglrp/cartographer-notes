@@ -1,0 +1,32 @@
+@startuml
+package "LocalTrajectoryBuilder_Pack" {
+  class LocalTrajectoryBuilder {
+    + AddRangeData()
+    + AddOdometryData();
+    ===
+      - AddAccumulatedRangeData()
+      - TransformToGravityAlignedFrameAndFilter()
+      - InsertIntoSubmap()
+      - ScanMatch()
+    ----
+      -active_submaps_
+      -motion_filter_
+      -extrapolator_
+      -num_accumulated_
+      -accumulated_range_data_
+      -accumulation_started_
+      -range_data_collator_
+    ---
+      -real_time_correlative_scan_matcher_
+      -ceres_scan_matcher_
+  }
+  
+  class LocalSlamResultCallback{
+
+  }
+
+class PoseExtrapolator
+
+LocalTrajectoryBuilder -down-> PoseExtrapolator
+}
+@enduml
